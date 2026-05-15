@@ -109,10 +109,10 @@ exports.login = async (req, res) => {
             { expiresIn }
         );
 
-        res.cookie("authToken", jtoken, {
+         res.cookie("authToken", jtoken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: process.env.COOKIE_SECURE === "true",
+            sameSite: process.env.COOKIE_SAMESITE || "lax", 
             maxAge,
         });
 
