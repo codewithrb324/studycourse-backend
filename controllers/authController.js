@@ -9,7 +9,7 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
-    secure: true,
+    secure: false,
     auth: {
         user: process.env.SMTP_UNAME,
         pass: process.env.SMTP_PASS
@@ -52,7 +52,7 @@ exports.signup = async (req, res) => {
 
         res.send({ code: 1 });
 
-        transporter.sendMail({
+       await transporter.sendMail({
             from: process.env.SMTP_UNAME,
             to: req.body.uname,
             subject: 'Activation mail from StudyCourse',
@@ -161,7 +161,7 @@ exports.resend = async (req, res) => {
 
         res.send({ code: 1 });
 
-        transporter.sendMail({
+        await transporter.sendMail({
             from: process.env.SMTP_UNAME,
             to: req.params.email,
             subject: "Resend Activation Mail from StudyCourse",
@@ -224,7 +224,7 @@ exports.forgot = async (req, res) => {
 
         await new Reset({ username: email, token, exptime }).save();
 
-        transporter.sendMail({
+      await transporter.sendMail({
             from: process.env.SMTP_UNAME,
             to: email,
             subject: 'Reset Password Mail from StudyCourse',
