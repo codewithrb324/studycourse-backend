@@ -7,18 +7,13 @@ const nodemailer = require("nodemailer");
 
 /* mailer */
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,  // 587 ke saath false
+    service: "gmail",
     auth: {
-        type: "OAuth2",
         user: process.env.SMTP_UNAME,
-        clientId: process.env.GMAIL_CLIENT_ID,
-        clientSecret: process.env.GMAIL_CLIENT_SECRET,
-        refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-    },
-    family: 4
+        pass: process.env.SMTP_PASS
+    }
 });
+
 /* SIGNUP */
 exports.signup = async (req, res) => {
     try {
