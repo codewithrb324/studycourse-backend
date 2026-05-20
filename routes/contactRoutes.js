@@ -1,25 +1,14 @@
 const router = require("express").Router();
+const nodemailer = require("nodemailer");
 const Contact = require("../models/Contact");
 
-const sendMail = async ({ to, subject, html }) => {
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "api-key": process.env.BREVO_API_KEY
-        },
-        body: JSON.stringify({
-            sender: { name: "StudyCourse", email: process.env.SMTP_USER },
-            to: [{ email: to }],
-            subject,
-            htmlContent: html
-        })
-    });
-    if (!response.ok) {
-        const err = await response.json();
-        throw new Error(JSON.stringify(err));
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.SMTP_UNAME,
+        pass: process.env.SMTP_PASS
     }
-};
+});
 
 router.post("/contactus", async (req, res) => {
     try {
@@ -31,6 +20,7 @@ router.post("/contactus", async (req, res) => {
 
         if (!captcha) return res.json("Captcha is required");
 
+        // Captcha verify — try ke andar
         const verifyURL = "https://www.google.com/recaptcha/api/siteverify";
         const captchaRes = await fetch(verifyURL, {
             method: "POST",
@@ -46,9 +36,11 @@ router.post("/contactus", async (req, res) => {
         // DB save
         await Contact.create({ name, email, phone, message });
 
-        // Email — transporter.sendMail ki jagah sendMail
-        sendMail({
-            to: "raghavbhanot908@gmail.com",
+        // Email
+        transporter.sendMail({
+            from: process.env.SMTP_UNAME,
+            to: process.env.SMTP_UNAME,
+            replyTo: email,
             subject: 'Message from Website - Contact Us',
             html: `<b>Name:-</b> ${name}<br/><b>Phone:-</b> ${phone}<br/><b>Email:-</b> ${email}<br/><b>Message:-</b> ${message}`
         }).catch(err => console.log("Mail error:", err));
