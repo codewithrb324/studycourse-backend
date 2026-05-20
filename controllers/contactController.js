@@ -9,7 +9,8 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
-    }
+    },
+    family: 4
 });
 
 exports.contactUs = async (req, res) => {
