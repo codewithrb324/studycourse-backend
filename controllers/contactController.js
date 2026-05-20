@@ -58,7 +58,7 @@ exports.contactUs = async (req, res) => {
   // SEND EMAIL (even if this fails, data is saved)
     const mailOptions = {
       from: process.env.SMTP_USER,
-      to: process.env.SMTP_USER,
+      to: "raghavbhanot908@gmail.com",
       replyTo: req.body.email,
       subject: 'Message from Website - Contact Us',
       html: `<b>Name:-</b> ${req.body.name}<br/><b>Phone:-</b> ${req.body.phone}<br/><b>Email:-</b> ${req.body.email}
