@@ -53,7 +53,7 @@ exports.signup = async (req, res) => {
         res.send({ code: 1 });
 
         transporter.sendMail({
-            from: process.env.SMTP_UNAME,
+            from: process.env.SMTP_USER,
             to: req.body.uname,
             subject: 'Activation mail from StudyCourse',
             html: `Dear ${req.body.pname},<br/><br/>
@@ -162,7 +162,7 @@ exports.resend = async (req, res) => {
         res.send({ code: 1 });
 
         transporter.sendMail({
-            from: process.env.SMTP_UNAME,
+            from: process.env.SMTP_USER,
             to: req.params.email,
             subject: "Resend Activation Mail from StudyCourse",
             html: `${process.env.CLIENT_URL}/activateaccount?id=${newCode}`
@@ -225,7 +225,7 @@ exports.forgot = async (req, res) => {
         await new Reset({ username: email, token, exptime }).save();
 
         transporter.sendMail({
-            from: process.env.SMTP_UNAME,
+            from: process.env.SMTP_USER,
             to: email,
             subject: 'Reset Password Mail from StudyCourse',
             html: `Dear ${user.name},<br/><br/>
