@@ -53,7 +53,7 @@ router.post("/contactus", async (req, res) => {
             html: `<b>Name:-</b> ${name}<br/><b>Phone:-</b> ${phone}<br/><b>Email:-</b> ${email}<br/><b>Message:-</b> ${message}`
         }).catch(err => console.log("Mail error:", err));
 
-        res.json({ code: 1, msg: "Message sent successfully" });
+        res.json("Message sent successfully");
 
     } catch (e) {
         console.log(e.message);
