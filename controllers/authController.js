@@ -3,25 +3,26 @@ const Reset = require("../models/ResetPassword");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uuid = require("uuid");
-const nodemailer = require("nodemailer");
 
-/* mailer */
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: false,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    },  
-    tls: {
-        rejectUnauthorized: false
-    },
-    socketOptions: {
-        family: 4    
+const sendMail = async ({ to, subject, html }) => {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "api-key": process.env.BREVO_API_KEY
+        },
+        body: JSON.stringify({
+            sender: { name: "StudyCourse", email: process.env.SMTP_USER },
+            to: [{ email: to }],
+            subject,
+            htmlContent: html
+        })
+    });
+    if (!response.ok) {
+        const err = await response.json();
+        throw new Error(JSON.stringify(err));
     }
-    
-});
+};
 
 /* SIGNUP */
 exports.signup = async (req, res) => {
@@ -59,18 +60,16 @@ exports.signup = async (req, res) => {
 
         res.send({ code: 1 });
 
-        transporter.sendMail({
-            from: process.env.SMTP_USER,
+        sendMail({
             to: req.body.uname,
             subject: 'Activation mail from StudyCourse',
             html: `Dear ${req.body.pname},<br/><br/>
-        Thank you for registering on <b>Study Course</b>!<br/><br/>
-        Click the link below to activate your account:<br/><br/>
-        <a href="${process.env.CLIENT_URL}/activateaccount?id=${code}">
-            ${process.env.CLIENT_URL}/activateaccount?id=${code}
-        </a>
-        <br/><br/>
-        If you did not register, please ignore this email.<br/><br/>`
+    Thank you for registering on <b>Study Course</b>!<br/><br/>
+    Click the link below to activate your account:<br/><br/>
+    <a href="${process.env.CLIENT_URL}/activateaccount?id=${code}">
+        ${process.env.CLIENT_URL}/activateaccount?id=${code}
+    </a><br/><br/>
+    If you did not register, please ignore this email.<br/><br/>`
         }).catch(err => console.log("Mail error:", err));
 
     } catch (err) {
@@ -118,10 +117,10 @@ exports.login = async (req, res) => {
             { expiresIn }
         );
 
-         res.cookie("authToken", jtoken, {
+        res.cookie("authToken", jtoken, {
             httpOnly: true,
             secure: process.env.COOKIE_SECURE === "true",
-            sameSite: process.env.COOKIE_SAMESITE || "lax", 
+            sameSite: process.env.COOKIE_SAMESITE || "lax",
             maxAge,
         });
 
@@ -168,8 +167,7 @@ exports.resend = async (req, res) => {
 
         res.send({ code: 1 });
 
-        transporter.sendMail({
-            from: process.env.SMTP_USER,
+        sendMail({
             to: req.params.email,
             subject: "Resend Activation Mail from StudyCourse",
             html: `${process.env.CLIENT_URL}/activateaccount?id=${newCode}`
@@ -231,17 +229,15 @@ exports.forgot = async (req, res) => {
 
         await new Reset({ username: email, token, exptime }).save();
 
-        transporter.sendMail({
-            from: process.env.SMTP_USER,
+        sendMail({
             to: email,
             subject: 'Reset Password Mail from StudyCourse',
             html: `Dear ${user.name},<br/><br/>
-        Click on the following link to reset your password<br/><br/>
-        <a href="${process.env.CLIENT_URL}/resetpassword?token=${token}">
-            ${process.env.CLIENT_URL}/resetpassword?token=${token}
-        </a>
-        <br/><br/>
-        This link is valid for 15 minutes only.<br/><br/>`
+    Click on the following link to reset your password<br/><br/>
+    <a href="${process.env.CLIENT_URL}/resetpassword?token=${token}">
+        ${process.env.CLIENT_URL}/resetpassword?token=${token}
+    </a><br/><br/>
+    This link is valid for 15 minutes only.<br/><br/>`
         }).catch(err => console.log("Mail error:", err));
 
         res.send({ code: 1 });
@@ -272,7 +268,7 @@ exports.reset = async (req, res) => {
             { pass: hash }
         );
 
-      await Reset.deleteOne({ token: req.body.token });
+        await Reset.deleteOne({ token: req.body.token });
 
         res.send({ code: 1 });
 
@@ -328,7 +324,7 @@ exports.searchUser = async (req, res) => {
         const user = await User.findOne({ username: req.params.email }).select("-pass");
         if (!user) return res.send({ code: 0 });
         res.send({ code: 1, udata: user });
-    } catch(e) {
+    } catch (e) {
         console.log(e.message);
         res.send({ code: 0 });
     }
@@ -344,7 +340,7 @@ exports.deleteMember = async (req, res) => {
         const result = await User.deleteOne({ _id: req.body.mid });
         res.send({ success: result.deletedCount === 1 });
 
-    } catch(e) {
+    } catch (e) {
         console.log(e.message);
         res.send({ success: false });
     }
@@ -363,12 +359,12 @@ exports.createAdmin = async (req, res) => {
             phone: req.body.phone,
             username: req.body.uname,
             pass: hash,
-            usertype: "admin",  
-            isActivated: true     
+            usertype: "admin",
+            isActivated: true
         }).save();
 
         res.send({ code: 1 });
-    } catch(e) {
+    } catch (e) {
         console.log(e.message);
         res.send({ code: 0 });
     }

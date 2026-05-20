@@ -1,14 +1,25 @@
 const router = require("express").Router();
-const nodemailer = require("nodemailer");
 const Contact = require("../models/Contact");
 
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.SMTP_UNAME,
-        pass: process.env.SMTP_PASS
+const sendMail = async ({ to, subject, html }) => {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "api-key": process.env.BREVO_API_KEY
+        },
+        body: JSON.stringify({
+            sender: { name: "StudyCourse", email: process.env.SMTP_USER },
+            to: [{ email: to }],
+            subject,
+            htmlContent: html
+        })
+    });
+    if (!response.ok) {
+        const err = await response.json();
+        throw new Error(JSON.stringify(err));
     }
-});
+};
 
 router.post("/contactus", async (req, res) => {
     try {
