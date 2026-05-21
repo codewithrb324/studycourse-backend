@@ -29,7 +29,7 @@ exports.contactUs = async (req, res) => {
         await sendEmail(
              process.env.MAIL_SENDER,
             "Message from Website - Contact Us",
-            `<b>Name:-</b> ${name}<br/><b>Phone:-</b> ${phone}<br/><b>Email:-</b> ${email}<br/><b>Message:-</b> ${message}`,email,name
+            `<b>Name:-</b> ${name}<br/><b>Phone:-</b> ${phone}<br/><b>Email:-</b> ${email}<br/><b>Message:-</b> ${message}`
         );
 
         res.send({ code: 1, msg: "Message sent successfully" });
