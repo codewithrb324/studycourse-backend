@@ -27,7 +27,7 @@ exports.contactUs = async (req, res) => {
         await Contact.create({ name, email, phone, message });
 
         await sendEmail(
-            "raghavbhanot908@gmail.com",
+            "studycoursenotify@outlook.com",
             "Message from Website - Contact Us",
             `<b>Name:-</b> ${name}<br/><b>Phone:-</b> ${phone}<br/><b>Email:-</b> ${email}<br/><b>Message:-</b> ${message}`
         );

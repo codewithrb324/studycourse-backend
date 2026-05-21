@@ -28,7 +28,7 @@ router.post("/contactus", async (req, res) => {
         await Contact.create({ name, email, phone, message });
 
         sendEmail(
-            "raghavbhanot908@gmail.com",
+            "studycoursenotify@outlook.com",
             "Message from Website - Contact Us",
             `<b>Name:-</b> ${name}<br/><b>Phone:-</b> ${phone}<br/><b>Email:-</b> ${email}<br/><b>Message:-</b> ${message}`
         );
