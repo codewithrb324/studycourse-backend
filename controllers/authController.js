@@ -3,25 +3,9 @@ const Reset = require("../models/ResetPassword");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uuid = require("uuid");
-const nodemailer = require("nodemailer");
-
+const sendEmail = require("../utils/mailer");
 /* mailer */
-const transporter = nodemailer.createTransport({
-    host: "in-v3.mailjet.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.MJ_APIKEY_PUBLIC,
-        pass: process.env.MJ_APIKEY_PRIVATE
-    }
-});
-transporter.verify((err, success) => {
-    if (err) {
-        console.log("Mailjet Error:", err);
-    } else {
-        console.log("Mailjet Ready");
-    }
-});
+
 
 /* SIGNUP */
 exports.signup = async (req, res) => {
