@@ -4,8 +4,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uuid = require("uuid");
 const sendEmail = require("../utils/mailer");
-/* mailer */
-
 
 /* SIGNUP */
 exports.signup = async (req, res) => {
@@ -56,9 +54,10 @@ exports.signup = async (req, res) => {
         );
 
     } catch (err) {
-        console.log(err.message);
-        res.send({ code: 0 });
-    }
+    console.log("SIGNUP ERROR:", err.message); // already hai
+    console.log("SIGNUP FULL ERROR:", err); // ← yeh add karo
+    res.send({ code: 0 });
+}
 };
 
 exports.login = async (req, res) => {
