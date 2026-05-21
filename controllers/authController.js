@@ -7,14 +7,20 @@ const nodemailer = require("nodemailer");
 
 /* mailer */
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    host: "in-v3.mailjet.com",
     port: 587,
     secure: false,
     auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    },
-    family: 4
+        user: process.env.MJ_APIKEY_PUBLIC,
+        pass: process.env.MJ_APIKEY_PRIVATE
+    }
+});
+transporter.verify((err, success) => {
+    if (err) {
+        console.log("Mailjet Error:", err);
+    } else {
+        console.log("Mailjet Ready");
+    }
 });
 
 /* SIGNUP */
@@ -54,7 +60,7 @@ exports.signup = async (req, res) => {
         res.send({ code: 1 });
 
         transporter.sendMail({
-            from: process.env.SMTP_USER,
+            from: process.env.MAIL_SENDER,
             to: req.body.uname,
             subject: 'Activation mail from StudyCourse',
             html: `Dear ${req.body.pname},<br/><br/>
@@ -163,7 +169,7 @@ exports.resend = async (req, res) => {
         res.send({ code: 1 });
 
         transporter.sendMail({
-            from: process.env.SMTP_USER,
+            from: process.env.MAIL_SENDER,
             to: req.params.email,
             subject: "Resend Activation Mail from StudyCourse",
             html: `${process.env.CLIENT_URL}/activateaccount?id=${newCode}`
@@ -226,7 +232,7 @@ exports.forgot = async (req, res) => {
         await new Reset({ username: email, token, exptime }).save();
 
         transporter.sendMail({
-            from: process.env.SMTP_USER,
+            from: process.env.MAIL_SENDER,
             to: email,
             subject: 'Reset Password Mail from StudyCourse',
             html: `Dear ${user.name},<br/><br/>

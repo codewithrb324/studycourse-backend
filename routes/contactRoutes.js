@@ -3,10 +3,20 @@ const nodemailer = require("nodemailer");
 const Contact = require("../models/Contact");
 
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "in-v3.mailjet.com",
+    port: 587,
+    secure: false,
     auth: {
-        user: process.env.SMTP_UNAME,
-        pass: process.env.SMTP_PASS
+        user: process.env.MJ_APIKEY_PUBLIC,
+        pass: process.env.MJ_APIKEY_PRIVATE
+    }
+});
+
+transporter.verify((err, success) => {
+    if (err) {
+        console.log("Mailjet Error:", err);
+    } else {
+        console.log("Mailjet Ready");
     }
 });
 
@@ -38,8 +48,8 @@ router.post("/contactus", async (req, res) => {
 
         // Email
         transporter.sendMail({
-            from: process.env.SMTP_UNAME,
-            to: process.env.SMTP_UNAME,
+           from: process.env.MAIL_SENDER,
+            to: process.env.MAIL_SENDER,
             replyTo: email,
             subject: 'Message from Website - Contact Us',
             html: `<b>Name:-</b> ${name}<br/><b>Phone:-</b> ${phone}<br/><b>Email:-</b> ${email}<br/><b>Message:-</b> ${message}`

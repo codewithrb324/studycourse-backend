@@ -1,10 +1,20 @@
 const Contact = require("../models/Contact");
 const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "in-v3.mailjet.com",
+    port: 587,
+    secure: false,
     auth: {
-        user: process.env.SMTP_UNAME,
-        pass: process.env.SMTP_PASS
+        user: process.env.MJ_APIKEY_PUBLIC,
+        pass: process.env.MJ_APIKEY_PRIVATE
+    }
+});
+
+transporter.verify((err, success) => {
+    if (err) {
+        console.log("Mailjet Error:", err);
+    } else {
+        console.log("Mailjet Ready");
     }
 });
 
@@ -52,7 +62,7 @@ exports.contactUs = async (req, res) => {
 
   // SEND EMAIL (even if this fails, data is saved)
     const mailOptions = {
-      from: process.env.SMTP_USER,
+      from: process.env.MAIL_SENDER,
       to: "raghavbhanot908@gmail.com",
       replyTo: req.body.email,
       subject: 'Message from Website - Contact Us',
