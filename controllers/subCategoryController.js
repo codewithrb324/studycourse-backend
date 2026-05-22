@@ -39,7 +39,7 @@ exports.addSubCategory = async (req, res) => {
 /* GET BY CATEGORY */
 exports.getByCategory = async (req, res) => {
   try {
-    const result = await SubCategory.find({ catid: req.query.cid }).populate("catid");
+    const result = await SubCategory.find({ catid: req.query.cid }).sort({ _id: 1 }).populate("catid");
 
     if (result.length === 0) {
       return res.send({ code: 0 });
@@ -55,7 +55,7 @@ exports.getByCategory = async (req, res) => {
 /* GET ALL (optional but useful) */
 exports.getAll = async (req, res) => {
   try {
-    const result = await SubCategory.find();
+    const result = await SubCategory.find().sort({ _id: 1 });;
 
     res.send({ code: 1, scdata: result });
 
