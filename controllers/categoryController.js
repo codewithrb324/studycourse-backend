@@ -33,7 +33,7 @@ exports.addCategory = async (req, res) => {
 /* GET ALL CATEGORIES */
 exports.getAllCategories = async (req, res) => {
   try {
-    const result = await Category.find();
+    const result = await Category.find().sort({ _id: 1 });
 
     if (result.length === 0) {
       return res.send({ code: 0 });
